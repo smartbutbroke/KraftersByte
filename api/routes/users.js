@@ -36,7 +36,7 @@ router.delete('/:id',async(req,res)=>{
 //get a user
 router.get('/:id',async(req,res)=>{
     try{
-        const user = await User.find({username:req.params.username});
+        const user = await User.findOne({username:req.params.id});
         const{password,updatedAt, ...other} = user._doc;
         res.status(200).json(other);
     }catch(err){
@@ -46,23 +46,22 @@ router.get('/:id',async(req,res)=>{
 
 //add a user to favourites or to remove
 router.put('/:id/favourite',async(req,res)=>{
-    if(req.body.username != req.params.id){
+    if(req.body.username !== req.params.id){
         try{
-            const currentUser = await User.find({username:req.body.username});
-            if(!user.followers.includes(req.body.username)){
-                await currentUser.updateOne({$push:{favourites:req.params.id}});
-                res.status(200).json("the user was added to favourites");
-            }
-            else{
-                await currentUser.updateOne({$pull:{favourites:req.params.id}});
-                res.status(200).json("the user was removed from favourites")
+            const currentUser = await User.findOne({username:req.body.username});
+            if(!currentUser.favourites.includes(req.params.id)){
+                await currentUser.updateOne({$push:{favourites:req.params.id}})
+                res.status(200).json("the user is added to your favourites")
+            }else{
+                await currentUser.updateOne({$pull:{favourites:req.params.id}})
+                res.status(200).json("the user has been removed from your favourites");
             }
         }catch(err){
             res.status(500).json(err);
         }
     }
     else{
-        res.status(403).json("you cannot follow yourself");
+        res.status(403).json("you cannot add yourself to favourites");
     }
 })
 

@@ -28,4 +28,20 @@ router.put('/:id',async(req,res)=>{
     }
 })
 
+//delete a log
+router.delete('/:id',async(req,res)=>{
+    try{
+        const log = Log.findById(req.params.id);
+        if(log.username === req.body.username){
+            await log.deleteOne();
+            res.status(200).json("the log has been deleted");
+        }
+        else{
+            res.status(403).json("you can only delete your own logs");
+        }
+    }catch(err){
+        res.status(500).json(err);
+    }
+})
+
 module.exports = router;
